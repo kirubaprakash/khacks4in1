@@ -1,95 +1,101 @@
-import * as pdfjsLib from 'pdfjs-dist';
+// ✅ Use LEGACY build (required for React / Vite / TS)
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+import pdfWorker from "pdfjs-dist/legacy/build/pdf.worker?url";
+import type { TextItem } from "pdfjs-dist/types/src/display/api";
 
-// Set up the worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// ✅ Correct worker binding (CRITICAL)
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export interface PDFExtractionResult {
   text: string;
   pageCount: number;
   extractedPages: number;
-  status: 'success' | 'partial' | 'failed';
+  status: "success" | "partial" | "failed";
   error?: string;
 }
 
-export async function extractTextFromPDF(file: File): Promise<PDFExtractionResult> {
+export async function extractTextFromPDF(
+  file: File
+): Promise<PDFExtractionResult> {
   let extractedPages = 0;
   let pageCount = 0;
-  
+
   try {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const buffer = await file.arrayBuffer();
+
+    const pdf = await pdfjsLib.getDocument({
+      data: buffer,
+      disableWorker: false,
+    }).promise;
+
     pageCount = pdf.numPages;
-    
-    let fullText = '';
+    let fullText = "";
     const failedPages: number[] = [];
-    
+
     for (let i = 1; i <= pageCount; i++) {
       try {
         const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(' ');
-        
-        if (pageText.trim()) {
-          fullText += pageText + '\n\n';
+        const content = await page.getTextContent();
+
+        // ✅ SAFE text extraction
+        const pageText = content.items
+          .filter((item): item is TextItem => "str" in item)
+          .map(item => item.str)
+          .join(" ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        if (pageText.length > 30) {
+          fullText += pageText + "\n\n";
           extractedPages++;
         }
-      } catch (pageError) {
-        console.error(`PDF extraction error on page ${i}:`, pageError);
+      } catch {
         failedPages.push(i);
       }
     }
-    
-    const trimmedText = fullText.trim();
-    
-    // Determine extraction status
-    if (extractedPages === 0 || !trimmedText) {
+
+    const text = fullText.trim();
+
+    // ❌ No text → scanned / image-based PDF
+    if (!text) {
       return {
-        text: '',
+        text: "",
         pageCount,
         extractedPages: 0,
-        status: 'failed',
-        error: 'No text could be extracted from the PDF. The document may be image-based or protected.',
+        status: "failed",
+        error:
+          "No selectable text found. This PDF appears to be scanned or image-based.",
       };
     }
-    
-    if (extractedPages < pageCount || failedPages.length > 0) {
+
+    // ⚠ Partial extraction
+    if (extractedPages < pageCount) {
       return {
-        text: trimmedText,
+        text,
         pageCount,
         extractedPages,
-        status: 'partial',
-        error: `Extracted ${extractedPages} of ${pageCount} pages. Some pages could not be processed.`,
+        status: "partial",
+        error: `Extracted ${extractedPages} of ${pageCount} pages.`,
       };
     }
-    
-    // Validate extraction quality - check for minimum content
-    const wordCount = trimmedText.split(/\s+/).length;
-    if (wordCount < 50) {
-      return {
-        text: trimmedText,
-        pageCount,
-        extractedPages,
-        status: 'partial',
-        error: 'Limited text extracted. The document may contain primarily images or non-standard formatting.',
-      };
-    }
-    
+
+    // ✅ Success
     return {
-      text: trimmedText,
+      text,
       pageCount,
       extractedPages,
-      status: 'success',
+      status: "success",
     };
   } catch (error) {
-    console.error('PDF extraction error:', error);
     return {
-      text: '',
+      text: "",
       pageCount,
       extractedPages: 0,
-      status: 'failed',
-      error: error instanceof Error ? error.message : 'Failed to extract PDF text',
+      status: "failed",
+      error:
+        error instanceof Error
+          ? error.message
+          : "PDF text extraction failed",
     };
   }
 }
