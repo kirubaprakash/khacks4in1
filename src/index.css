@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Academic Research Platform Design System
+   Minimal, institutional aesthetic - no gradients, no animations
+   All colors MUST be HSL
+*/
+
+@layer base {
+  :root {
+    /* Core palette - Academic minimal */
+    --background: 0 0% 100%;
+    --foreground: 220 15% 15%;
+
+    /* Card surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 15%;
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
+
+    /* Primary - Dark blue (academic accent) */
+    --primary: 213 50% 23%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light gray */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 15% 15%;
+
+    /* Muted - Subtle gray */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    /* Accent */
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 15% 15%;
+
+    /* Semantic colors */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Originality indicators */
+    --originality-unique: 142 71% 45%;
+    --originality-unique-bg: 142 76% 94%;
+    --originality-referenced: 48 96% 53%;
+    --originality-referenced-bg: 48 100% 94%;
+    --originality-risk: 0 84% 60%;
+    --originality-risk-bg: 0 93% 94%;
+
+    /* Form elements */
+    --border: 220 13% 87%;
+    --input: 220 13% 87%;
+    --ring: 213 50% 23%;
+
+    --radius: 0.25rem;
+
+    /* Sidebar */
+    --sidebar-background: 220 14% 98%;
+    --sidebar-foreground: 220 15% 25%;
+    --sidebar-primary: 213 50% 23%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 94%;
+    --sidebar-accent-foreground: 220 15% 15%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 213 50% 23%;
+  }
+
+  .dark {
+    --background: 220 15% 10%;
+    --foreground: 220 14% 96%;
+
+    --card: 220 15% 12%;
+    --card-foreground: 220 14% 96%;
+
+    --popover: 220 15% 12%;
+    --popover-foreground: 220 14% 96%;
+
+    --primary: 213 50% 60%;
+    --primary-foreground: 220 15% 10%;
+
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 220 14% 96%;
+
+    --muted: 220 15% 18%;
+    --muted-foreground: 220 9% 60%;
+
+    --accent: 220 15% 18%;
+    --accent-foreground: 220 14% 96%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --originality-unique: 142 71% 45%;
+    --originality-unique-bg: 142 50% 15%;
+    --originality-referenced: 48 96% 53%;
+    --originality-referenced-bg: 48 50% 15%;
+    --originality-risk: 0 84% 60%;
+    --originality-risk-bg: 0 50% 15%;
+
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 213 50% 60%;
+
+    --sidebar-background: 220 15% 8%;
+    --sidebar-foreground: 220 14% 90%;
+    --sidebar-primary: 213 50% 60%;
+    --sidebar-primary-foreground: 220 15% 10%;
+    --sidebar-accent: 220 15% 15%;
+    --sidebar-accent-foreground: 220 14% 96%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 213 50% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* Academic typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  /* Academic content font */
+  .font-academic {
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+}
+
+@layer components {
+  /* Highlighted text states */
+  .highlight-unique {
+    background-color: hsl(var(--originality-unique-bg));
+    border-bottom: 2px solid hsl(var(--originality-unique));
+  }
+
+  .highlight-referenced {
+    background-color: hsl(var(--originality-referenced-bg));
+    border-bottom: 2px solid hsl(var(--originality-referenced));
+  }
+
+  .highlight-risk {
+    background-color: hsl(var(--originality-risk-bg));
+    border-bottom: 2px solid hsl(var(--originality-risk));
+  }
+
+  /* Table styles */
+  .academic-table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .academic-table th {
+    @apply text-left font-medium text-muted-foreground border-b border-border px-4 py-3;
+  }
+
+  .academic-table td {
+    @apply border-b border-border px-4 py-3;
+  }
+
+  .academic-table tr:hover {
+    @apply bg-muted/50;
+  }
+
+  /* Panel layout */
+  .panel-left {
+    @apply border-r border-border;
+  }
+
+  .panel-right {
+    @apply overflow-y-auto;
+  }
+}
